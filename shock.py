@@ -37,6 +37,7 @@ cs = np.sqrt(gamma*p/rho)                #sound speed
 csL = np.sqrt(gamma*PL/rhoL)  #initial sound speed to left of barrier
 dt = 0.5*np.min(dx/np.sqrt(cs**2+v**2))  #cfl condition for dt
 
+# riemann solution from Hawley+ 1984
 def post_shock_p(pps):
     # equation for finding post shock pressure
     # need to solve post_shock_p(pps) = 0
@@ -44,8 +45,7 @@ def post_shock_p(pps):
             (PL**((gamma-1)/(2*gamma))-pps**((gamma-1)/(2*gamma)))\
             -(pps-PR)*((1-mu2)/(rhoR*(pps+mu2*PR)))**0.5
 
-# riemann solution
-# some quantities are static so just calculate once
+ # some quantities are static so just calculate once
 pps = opt.fsolve(post_shock_p,PR)  # find post shock pressure numerically
                                    # i am cheating and using scipy's solver
 vps = (pps-PR)*((1-mu2)/(rhoR*(pps+mu2*PR)))**0.5  # post shock velocity
@@ -54,6 +54,7 @@ rhomid = rhoL*(pps/PL)**(1/gamma)                  # density in mid region
 csmid = np.sqrt(gamma*pps/rhomid)
 vsh = vps/(1-rhoR/rhops)                           # shock front velocity
 def riemann_soln(time):
+    #solution as a function of time
     vrie = np.zeros_like(x)
     prie = np.zeros_like(x)
     rho_rie = np.zeros_like(x)
@@ -66,7 +67,7 @@ def riemann_soln(time):
     #stitch solution together
     ileft = (x<xrare)                      # mask for left region
     irarew = np.logical_and(x>=xrare,x<xmid) #mask for rarefaction wave region
-    imid = np.logical_and(x>=xmid,x<xcd)  # mask for middle region
+    imid = np.logical_and(x>=xmid,x<xcd)   # mask for middle region
     ipostsh = np.logical_and(x>=xcd,x<xsh) # mask for post shock region
     iright = (x>=xsh)                      # mask for pre shock region
     #velocity
@@ -86,11 +87,11 @@ def riemann_soln(time):
     prie[ipostsh] = pps
     prie[iright] = PR
     #energy
-    energy_rie = prie/(gamma-1) + 0.5*rho_rie*vrie**2 
+    energy_rie = prie/(gamma-1) + 0.5*rho_rie*vrie**2
 
     return vrie, energy_rie, rho_rie, prie
 
-#set up figure axis
+#set up figure axes
 fig = plt.figure(figsize=(12,7))
 ax1 = fig.add_subplot(221)
 line1, = ax1.plot(x,v)
@@ -162,9 +163,11 @@ while stop == 0:
     if dt > dtmin:
         dt = dtmin
 
+    #nearing the end... do one more step
     if time+dt > tfinal:
         dt = tfinal - time
 
+    #stop now
     if time >= tfinal:
         stop = 1
         next = time
