@@ -9,7 +9,7 @@ nstep = 1000   # number of time steps
 L = 2.0      # size of domain
 dt = 0.004  # time step size  (dt < 0.5*dx**2/D and dt < 2*D/U**2)
 U = 1       # flow velocity
-D = 0.0     # diffusion coeff
+D = 0.05     # diffusion coeff
 k = 1        # wave number
 amp = 0.5    # amplitude of wave
 
