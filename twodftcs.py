@@ -10,7 +10,7 @@ nstep = 140   #number of time steps
 D = 0.025    #diffusion coefficient
 Lx = 2.0     #size of domain in x
 Ly = 2.0     #size of domain in y
-dt = 0.02    #time step
+dt = 0.04    #time step
 u = 1.0      #x-velocity
 v = 0.0      #y-velocity
 

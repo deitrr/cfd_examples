@@ -9,7 +9,7 @@ nstep = 1000   # number of time steps
 L = 2.0      # size of domain
 dt = 0.004  # time step size  (dt < 0.5*dx**2/D and dt < 2*D/U**2)
 U = 1       # flow velocity
-D = 0.05     # diffusion coeff
+D = 0.0     # diffusion coeff
 k = 1        # wave number
 amp = 0.5    # amplitude of wave
 
@@ -43,11 +43,25 @@ for m in np.arange(nstep):
     plt.pause(0.1*dt)  #slow it down a little
     ftmp = f.copy() #store tmp copy of f from prev time step
     for j in np.arange(1,N-1):   #spatial loop
+        #FTCS
         f[j] = ftmp[j]-((0.5*U/dx)*(ftmp[j+1]-ftmp[j-1])-\
                 D/dx**2*(ftmp[j+1]-2*ftmp[j]+ftmp[j-1]))*dt
+        #Upwind
+        # f[j] = ftmp[j]-((U/dx)*(ftmp[j]-ftmp[j-1])-\
+        #         D/dx**2*(ftmp[j+1]-2*ftmp[j]+ftmp[j-1]))*dt
+        #Lax
+        # f[j] = 0.5*(ftmp[j+1]+ftmp[j-1])-((0.5*U/dx)*(ftmp[j+1]-ftmp[j-1])-\
+        #         D/dx**2*(ftmp[j+1]-2*ftmp[j]+ftmp[j-1]))*dt
     # periodic boundary condition
+    #FTCS
     f[N-1] = ftmp[N-1]-((0.5*U/dx)*(ftmp[1]-ftmp[N-2])-\
                 D/dx**2*(ftmp[1]-2*ftmp[N-1]+ftmp[N-2]))*dt
+    #Upwind
+    # f[N-1] = ftmp[N-1]-((U/dx)*(ftmp[0]-ftmp[N-2])-\
+    #             D/dx**2*(ftmp[1]-2*ftmp[N-1]+ftmp[N-2]))*dt
+    #Lax
+    # f[N-1] = 0.5*(ftmp[0]+ftmp[N-2])-((0.5*U/dx)*(ftmp[1]-ftmp[N-2])-\
+    #             D/dx**2*(ftmp[1]-2*ftmp[N-1]+ftmp[N-2]))*dt
     f[0] = f[N-1]
     time = time + dt
     # plot new values and exact solution
